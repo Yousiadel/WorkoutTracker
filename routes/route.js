@@ -2,7 +2,7 @@
 // =============================================================
 const router = require("express").Router();
 // Requiring our Todo model
-var db = require("../models");
+const Workout = require("../models/workout.js");
 const path = require("path");
 
 // Routes
@@ -25,10 +25,7 @@ router.get("/stats", function (req, res) {
 
 
 router.get("/api/workouts", (req, res) => {
-    db.Workout.find({})
-        .sort({
-            day: 1
-        })
+    Workout.find({})
         .then(dbWorkout => {
             res.json(dbWorkout);
             console.log(1);
@@ -40,7 +37,7 @@ router.get("/api/workouts", (req, res) => {
 });
 
 router.get("/api/workouts/range", (req, res) => {
-    db.Workout.find({})
+    Workout.find({})
         .then(dbWorkout => {
             res.json(dbWorkout);
             console.log(3);
@@ -53,9 +50,7 @@ router.get("/api/workouts/range", (req, res) => {
 
 router.post("/api/workouts/", (req, res) => {
     console.log("createWorkout", req.body);
-    db.Workout.create({
-            exercises: [req.body]
-        })
+    Workout.create({})
         .then(dbWorkout => {
             res.json(dbWorkout);
             console.log(5, dbWorkout);
@@ -65,59 +60,20 @@ router.post("/api/workouts/", (req, res) => {
             // console.log(6);
         });
 
-    // const workout = {
-    //   exercise: req.body.exercise,
-    //   name: req.body.name,
-    //   duration: req.body.duration,
-    //   weight: req.body.weight,
-    //   reps: req.body.reps,
-    //   sets: req.body.sets,
-    //   distance: req.body.distance
-    // };
-    // const workout = new Workout({
-    //   _id: mongoose.Schema.Types.ObjectId(),
-    //   exercise: req.body.exercise,
-    //   name: req.body.name,
-    //   duration: req.body.duration,
-    //   weight: req.body.weight,
-    //   reps: req.body.reps,
-    //   sets: req.body.sets,
-    //   distance: req.body.distance
-    // });
-    // workout
-    // .save()
-    // .then(result => {
-    //   console.log(result);
-    // })
-    // .catch(err => console.log(err));
+router.put("/api/workouts/:id", ({body, params}, res) => {
 
-    // -------------------------------
-});
+    // console.log(req.params.id);
+    // console.log(req.body);
 
-// router.get("/populatedWorkout", (req, res) => {
-//   db.Workout.find({})
-//     .populate("Workouts")
-//     .then(dbWorkout => {
-//       res.json(dbWorkout);
-//     })
-//     .catch(err => {
-//       res.json(err);
-//     });
-// });
-
-router.put("/api/workouts/:id", (req, res) => {
-
-    console.log(req.params.id);
-    console.log(req.body);
-
-    db.Workout.findOneAndUpdate({
-            _id: req.params.id
-        }, {
+    Workout.findByIdAndUpdate(
+            params.id,
+        {
             $push: {
-                exercises: req.body
+                exercises: body
             }
         }, {
-            new: true
+            new: true,
+            runValidators: true
         })
         // .populate("Workouts")
         .then(dbWorkout => {
